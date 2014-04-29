@@ -1,0 +1,135 @@
+<html>
+<head>
+    <title>Akka Tracing - Activator Template</title>
+</head>
+<body>
+
+<div>
+    <h2>Introduction to Akka Tracing</h2>
+
+    <p>
+        <a href="https://github.com/levkhomich/akka-tracing" target="_blank">Akka Tracing</a>
+        is a distributed tracing Akka extension based on Twitter's Zipkin,
+        which can be used as performance diagnostics or debugging tool for distributed applications.
+    </p>
+
+
+    <p>
+        <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/timeline.png" width="800px" />
+    </p>
+
+    <p>
+        <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/annotations.png" width="800px" />
+    </p>
+
+    <p>
+        For more information about Akka Tracing Extension, please refer to project's
+        <a href="https://github.com/levkhomich/akka-tracing" target="_blank">github page</a> and
+        <a href="https://github.com/levkhomich/akka-tracing/wiki" target="_blank">wiki</a>.
+    </p>
+    <p>
+        For more information about Zipkin, you can explore
+        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project site</a>
+        or ask questions in the
+        <a href="https://groups.google.com/forum/#!forum/zipkin-user" target="_blank">Zipkin user group</a>.
+    </p>
+</div>
+<div>
+    <h2>Setup</h2>
+
+    <h3>Zipkin</h3>
+
+    <p>Clone project from its official repo:</p>
+
+<pre><code>
+mkdir ~/opt && cd ~/opt
+git clone https://github.com/twitter/zipkin.git && cd zipkin
+</code></pre>
+
+    <p>Tracing extension only requires collector service running:</p>
+
+<pre><code>
+bin/collector
+</code></pre>
+
+    <p>To actually search and inspect traces, launch query and web services in different bash sessions:</p>
+
+<pre><code>
+bin/query
+bin/web
+</code></pre>
+
+    <p>Zipkin Web UI will be available via http://localhost:8080.</p>
+
+    <p>More comprehensive setup guide can be found <a href="http://twitter.github.io/zipkin/install.html">here</a>.</p>
+
+    <h3>Project</h3>
+
+    <h4>SBT</h4>
+
+    <p>Include extension to the list of your project's dependencies:</p>
+
+<pre><code>
+libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.2"
+</code></pre>
+
+    <p>or, if you want to experiment with snapshot:</p>
+
+<pre><code>
+resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"<br />
+libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.3-SNAPSHOT" changing()
+</code></pre>
+
+    <h4>Maven</h4>
+
+    <p>To use latest stable version:</p>
+
+<pre><code>
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.levkhomich&lt;/groupId&gt;
+    &lt;artifactId&gt;akka-tracing-core_2.10&lt;/artifactId&gt;
+    &lt;version&gt;0.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+    <p>To use snapshot:</p>
+
+<pre><code>
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.levkhomich&lt;/groupId&gt;
+    &lt;artifactId&gt;akka-tracing-core_2.10&lt;/artifactId&gt;
+    &lt;version&gt;0.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+    <p>Also make sure you've <a href="http://stackoverflow.com/questions/7715321/how-to-download-snapshot-version-from-maven-snapshot-repository">enabled Sonatype snapshots</a>.</p>
+
+    <h3>Typesafe config</h3>
+
+    <p>You will need to define collector's endpoint:</p>
+
+<pre><code>
+akka.tracing {
+  host = "localhost"
+  port = 9410 # default
+}
+</code></pre>
+
+    <p>Also you can setup extension to be initialized with actor system (it's not required, though):</p>
+
+<pre><code>
+akka.extensions += "com.github.levkhomich.akka.tracing.TracingExtension"
+</code></pre>
+
+</div>
+<div>
+    <h2>Resources</h2>
+
+    <p>Information about Akka Tracing and Zipkin:</p>
+    <ul>
+        <li><a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project page</a></li>
+    </ul>
+</div>
+
+</body>
+</html>
