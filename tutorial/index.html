@@ -5,14 +5,26 @@
 <body>
 
 <div>
-    <h2>Introduction to Akka Tracing</h2>
+    <h2>Introduction</h2>
+
+    <p>
+        This tutorial aims to show you how to trace messages inside Akka system.
+        You will be guided through the tracing basics, sampling, hierarchical calls and spray integration.
+        To see actual results you will need to have Twitter's Zipkin installed. Don't worry,
+        template contains script that will allow you to easily install and run it.
+    </p>
+
+    <h3>Akka Tracing</h3>
 
     <p>
         <a href="https://github.com/levkhomich/akka-tracing" target="_blank">Akka Tracing</a>
-        is a distributed tracing Akka extension based on Twitter's Zipkin,
-        which can be used as performance diagnostics or debugging tool for distributed applications.
+        is a distributed tracing Akka extension based on Twitter's Zipkin.
+        It can be used as performance diagnostics or debugging tool for distributed applications.
     </p>
 
+    <p>
+        But it's better to see once:
+    </p>
 
     <p>
         <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/timeline.png" width="800px" />
@@ -22,22 +34,56 @@
         <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/annotations.png" width="800px" />
     </p>
 
+</div>
+
+<div>
+    <h2>Template overview</h2>
+
     <p>
-        For more information about Akka Tracing Extension, please refer to project's
-        <a href="https://github.com/levkhomich/akka-tracing" target="_blank">github page</a> and
-        <a href="https://github.com/levkhomich/akka-tracing/wiki" target="_blank">wiki</a>.
-    </p>
-    <p>
-        For more information about Zipkin, you can explore
-        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project site</a>
-        or ask questions in the
-        <a href="https://groups.google.com/forum/#!forum/zipkin-user" target="_blank">Zipkin user group</a>.
+        The application consists of three parts:
+        <ul>
+            <li>
+                <a href="#code/src/main/scala/org/example/TraceHierarchy.scala" class="shortcut">Scala example</a>
+                showing call hierarchy tracing. Application just creates actor system and sends couple of traced messages.
+                Afterwards, you can see them using Zipkin Web UI.
+            </li>
+            <li>
+                <a href="#code/src/main/java/org/example/javaapi/TraceHierarchy.java" class="shortcut">Java example</a>
+                showing the same thing;
+            </li>
+            <li>
+                <a href="#code/src/main/scala/org/example/SprayDirectives.scala" class="shortcut">Spray integration example</a>
+                (not well documented yet). This application starts http server with couple of routes with enabled tracing.
+                You can perform requests using curl or browser.
+            </li>
+        </ul>
     </p>
 </div>
+
 <div>
+
     <h2>Setup</h2>
 
-    <h3>Zipkin</h3>
+    <h3>Install script</h3>
+
+    <p>Template provides simple script that can pull, build and run Zipkin server. Just run this command from project's dir:</p>
+
+<pre><code>
+    zipkin.sh install && zipkin.sh start
+</code></pre>
+
+
+    <p>To stop Zipkin, type</p>
+
+<pre><code>
+    zipkin.sh stop
+</code></pre>
+
+    <p>Installation can take up to 10-15 minutes, so it's a good time to take a cup of tea before you continue reading.</p>
+
+    <h3>Another Way</h3>
+
+    <p>If you want to install Zipkin manually, do the following.</p>
 
     <p>Clone project from its official repo:</p>
 
@@ -59,13 +105,106 @@ bin/query
 bin/web
 </code></pre>
 
-    <p>Zipkin Web UI will be available via http://localhost:8080.</p>
+    <p>Zipkin Web UI will be available via <a href="http://localhost:8080">http://localhost:8080</a>.</p>
 
     <p>More comprehensive setup guide can be found <a href="http://twitter.github.io/zipkin/install.html">here</a>.</p>
 
-    <h3>Project</h3>
+</div>
 
-    <h4>SBT</h4>
+
+<div>
+    <h2>Tracing overview</h2>
+
+    <p>Every message's trace lifecycle consists of several stages:</p>
+
+    <ol>
+        <li>
+            <em>Sampling</em>. Before actual trace is created, message needs to be successfully sampled.
+            Such mechanism allows setup tracing extension to sample only some part of messages to reduce
+            overhead when used in production environment.
+        </li>
+        <li>
+            <em>Annotating</em>. Any (created) trace can be annotated by basic and binary annotations.
+            Basic annotations contain timestamp and description and can be displayed in timeline. Binary
+            annotations are key-value pairs attached to trace itself.
+        </li>
+        <li>
+            <em>Submitting</em>. After some message was explicitly marked as response to traced message,
+            corresponding trace is sent to (external) collector service. If response remains unspecified,
+            trace will be sent anyway after some timeout. Any annotations written to already submitted
+            trace are ignored.
+        </li>
+    </ol>
+</div>
+
+<div>
+    <h2>Tracing API</h2>
+
+    <h3>Scala</h3>
+
+    <p>
+        All you need is to mark all traceable messages your system uses with <code>TracingSupport</code> trait and
+        mix all actors from which you want to annotate your traces with <code>ActorTracing</code>.
+    </p>
+
+    <h3>Java</h3>
+
+    <p>While you can access all tracing features from Java API, it can be confusing sometimes.</p>
+
+    <p>You have two options on how to mark your traceable messages:</p>
+
+    <ul>
+        <li>extend <code>japi.TracingSupport</code></li>
+        <li>implement <code>BaseTracingSupport</code> and it's methods as it done in
+            <a href="https://github.com/levkhomich/akka-tracing/blob/master/core/src/main/java/com/github/levkhomich/akka/tracing/japi/TracingSupport.java"><code>japi.TracingSupport</code></a>
+        </li>
+    </ul>
+
+    <p>To access extension itself, define <code>trace</code> field:</p>
+
+<pre><code>TracingExtensionImpl trace = (TracingExtensionImpl) TracingExtension.apply(context().system());</code></pre>
+
+    <h3>Sampling</h3>
+
+    <p>
+        Sampling is performed using <code>trace.sample(msg, serviceName, rpcName)</code> method.
+        Recommended way of message sampling is to call this method as soon as you can after message
+        was received by your actor system. Sampling rate can be changed using
+        <code>akka.tracing.sample-rate</code> config parameter.
+    </p>
+
+    <h3>Annotating traces</h3>
+
+    <p>There are several methods allowing you to annotate traces:</p>
+
+    <ol>
+        <li>
+            <code>trace.record(msg, annotation)</code> - attaches string annotation to message trace timeline.
+            Such annotations can be used by <code>annotation</code> filter in Web UI.</li>
+        <li>
+            <code>trace.recordKeyValue(msg, key, value)</code> - annotates trace by key-value pair,
+            where value can be represented by String, Short, Int, Long, Boolean, Double or Array[Byte].
+            This kind of annotations can be used by <code>key-value</code> filter in Web UI.</li>
+        <li>
+            <code>trace.recordException(msg, exception)</code> - pipes exception stack trace to message trace timeline.
+        </li>
+    </ol>
+
+    <h2>Submitting</h2>
+
+    <p>
+        After you mark that message processing was finished by marking response with
+        <code>someMessage.asResponseTo(request)</code>. Corresponding trace will be closed and submitted
+        to collector service.
+    </p>
+</div>
+
+
+<div>
+
+    <h2>Project setup</h2>
+
+    <h3>SBT</h3>
 
     <p>Include extension to the list of your project's dependencies:</p>
 
@@ -76,33 +215,10 @@ libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.2"
     <p>or, if you want to experiment with snapshot:</p>
 
 <pre><code>
-resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"<br />
+resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+
 libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.3-SNAPSHOT" changing()
 </code></pre>
-
-    <h4>Maven</h4>
-
-    <p>To use latest stable version:</p>
-
-<pre><code>
-&lt;dependency&gt;
-    &lt;groupId&gt;com.github.levkhomich&lt;/groupId&gt;
-    &lt;artifactId&gt;akka-tracing-core_2.10&lt;/artifactId&gt;
-    &lt;version&gt;0.2&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-
-    <p>To use snapshot:</p>
-
-<pre><code>
-&lt;dependency&gt;
-    &lt;groupId&gt;com.github.levkhomich&lt;/groupId&gt;
-    &lt;artifactId&gt;akka-tracing-core_2.10&lt;/artifactId&gt;
-    &lt;version&gt;0.3-SNAPSHOT&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-
-    <p>Also make sure you've <a href="http://stackoverflow.com/questions/7715321/how-to-download-snapshot-version-from-maven-snapshot-repository">enabled Sonatype snapshots</a>.</p>
 
     <h3>Typesafe config</h3>
 
@@ -118,17 +234,29 @@ akka.tracing {
     <p>Also you can setup extension to be initialized with actor system (it's not required, though):</p>
 
 <pre><code>
-akka.extensions += "com.github.levkhomich.akka.tracing.TracingExtension"
+    akka.extensions += "com.github.levkhomich.akka.tracing.TracingExtension"
 </code></pre>
 
 </div>
+
 <div>
     <h2>Resources</h2>
 
-    <p>Information about Akka Tracing and Zipkin:</p>
-    <ul>
-        <li><a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project page</a></li>
-    </ul>
+    <p>
+        For more information about Akka Tracing Extension, please refer to project's
+        <a href="https://github.com/levkhomich/akka-tracing" target="_blank">github page</a> and
+        <a href="https://github.com/levkhomich/akka-tracing/wiki" target="_blank">wiki</a>.
+    </p>
+    <p>
+        For more information about Zipkin, you can explore
+        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project site</a>
+        or ask questions in the
+        <a href="https://groups.google.com/forum/#!forum/zipkin-user" target="_blank">Zipkin user group</a>.
+    </p>
+    <p>
+        If you have any suggestions or want to ask about project, feel free to contact me via
+        <a href="https://twitter.com/levkhomich">twitter</a>.
+    </p>
 </div>
 
 </body>
