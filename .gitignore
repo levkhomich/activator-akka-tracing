@@ -9,6 +9,7 @@ lib_managed/
 src_managed/
 zipkin/
 project/boot/
+project/activator-*
 .history
 .cache
 
