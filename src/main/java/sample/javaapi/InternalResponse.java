@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.example.javaapi;
+package sample.javaapi;
 
 import com.github.levkhomich.akka.tracing.japi.TracingSupport;
 

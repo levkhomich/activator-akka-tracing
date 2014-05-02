@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package org.example.javaapi;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+package sample.javaapi;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import static akka.pattern.Patterns.ask;
 import com.typesafe.config.ConfigFactory;
+import scala.concurrent.duration.FiniteDuration;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static akka.pattern.Patterns.ask;
 
 public class TraceHierarchy {
 
@@ -34,13 +37,16 @@ public class TraceHierarchy {
 
     public static void main(String[] args) {
         ActorSystem system = ActorSystem.create("TraceHierarchySystem", ConfigFactory.load("application"));
-        ActorRef handler = system.actorOf(Props.create(RequestHandler.class), "requestHandler");
+        final ActorRef handler = system.actorOf(Props.create(RequestHandler.class), "requestHandler");
 
-        for (int i = 0; i < 100; i++) {
-            Map<String, String> params = new HashMap<>();
-            params.put("userAgent", random());
-            ask(handler, new ExternalRequest(params, random()), 500);
-        }
+        system.scheduler().schedule(FiniteDuration.apply(2, TimeUnit.SECONDS), FiniteDuration.apply(1, TimeUnit.SECONDS),
+            new Runnable() {
+                public void run() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("userAgent", random());
+                    ask(handler, new ExternalRequest(params, random()), 500);
+                }
+            }, system.dispatcher());
 
         system.awaitTermination();
     }

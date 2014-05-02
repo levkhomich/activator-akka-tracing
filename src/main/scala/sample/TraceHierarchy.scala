@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.example
+package sample
 
 import java.util
 import java.util.UUID
 import scala.collection.JavaConversions._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -27,7 +28,7 @@ import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 
 import com.github.levkhomich.akka.tracing.{ActorTracing, TracingSupport}
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.ConfigFactory
 
 final case class ExternalRequest(headers: util.Map[String, String], payload: String) extends TracingSupport
 final case class ExternalResponse(responseCode: Int, payload: String)
@@ -35,20 +36,20 @@ final case class InternalRequest(payload: String) extends TracingSupport
 final case class InternalResponse(responseCode: Int, payload: String)
 
 class RequestHandler extends Actor with ActorTracing {
-
-  import context.dispatcher
-
   val child: ActorRef = context.actorOf(Props[DelegateActor])
-  implicit val askTimeout: Timeout = 200.milliseconds
+  implicit val askTimeout: Timeout = 100.milliseconds
 
   override def receive: Receive = {
     case msg @ ExternalRequest(headers, payload) =>
-      // notify tracing extension about external request to be sampled and traced, name service processing request
+      println("RequestHandler received " + msg)
+
+      // sample request
       trace.sample(msg, this.getClass.getSimpleName)
 
       // add info about request headers to trace
       headers.foreach { case (k, v) => trace.recordKeyValue(msg, k, v)}
 
+      // to trace child request correctly, mark it using asChildOf
       child ? InternalRequest(payload).asChildOf(msg) recover {
         case e: Exception =>
           // trace exception
@@ -63,28 +64,24 @@ class RequestHandler extends Actor with ActorTracing {
 }
 
 class DelegateActor extends Actor with ActorTracing {
-
   override def receive: Receive = {
     case msg @ InternalRequest(payload) =>
+      println("DelegateActor received " + msg)
       trace.sample(msg, this.getClass.getSimpleName)
-      // another computation (sometimes leading to timeout)
-      Thread.sleep(Random.nextInt(30))
+      // another computation (sometimes leading to timeout processed by recover block above)
+      Thread.sleep(Random.nextInt(200))
       sender ! InternalResponse(200, s"Hello, $payload").asResponseTo(msg)
   }
 }
 
+// create actor system and send messages every second
 object TraceHierarchy extends App {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
   implicit val askTimeout: Timeout = 500.milliseconds
-
   def random = UUID.randomUUID().toString
-
-  val system = ActorSystem.create("TraceHierarchySystem", ConfigFactory.load("application"))
+  val system = ActorSystem.create("TraceHierarchy", ConfigFactory.load("application"))
   val handler = system.actorOf(Props[RequestHandler])
-
-  for (_ <- 1 to 100)
+  system.scheduler.schedule(3.seconds, 1.second) {
     handler ? ExternalRequest(Map("userAgent" -> random), random)
-
+  }
   system.awaitTermination()
 }

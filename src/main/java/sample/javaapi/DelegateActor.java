@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.example.javaapi;
-
-import java.util.Random;
+package sample.javaapi;
 
 import akka.actor.UntypedActor;
-
 import com.github.levkhomich.akka.tracing.TracingExtension;
 import com.github.levkhomich.akka.tracing.TracingExtensionImpl;
+
+import java.util.Random;
 
 public class DelegateActor extends UntypedActor {
 
@@ -31,11 +30,15 @@ public class DelegateActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof InternalRequest) {
             InternalRequest msg = (InternalRequest) message;
+            System.out.print("DelegateActor received " + msg);
+
             // notify tracing extension about external request to be sampled and traced, name service processing request
             trace.sample(msg, this.getClass().getSimpleName());
             // another computation (sometimes leading to timeout)
-            Thread.sleep(rng.nextInt(30));
-            sender().tell(new InternalResponse(200, "Hello, " + msg.getPayload()), self()); //.asResponseTo(msg)
+            Thread.sleep(rng.nextInt(200));
+            sender().tell(new InternalResponse(200, "Hello, " + msg.getPayload()), self());
+            // fire server send event
+            trace.recordServerSend(msg);
         } else {
             unhandled(message);
         }

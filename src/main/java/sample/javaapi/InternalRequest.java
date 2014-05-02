@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package org.example.javaapi;
+package sample.javaapi;
 
 import com.github.levkhomich.akka.tracing.japi.TracingSupport;
 
-public class ExternalResponse extends TracingSupport {
-    private final int responseCode;
+public class InternalRequest extends TracingSupport {
     private final String payload;
-
-    public int getResponseCode() {
-        return responseCode;
-    }
 
     public String getPayload() {
         return payload;
     }
 
-    public ExternalResponse(int responseCode, String payload) {
-        this.responseCode = responseCode;
+    public InternalRequest(String payload) {
         this.payload = payload;
     }
 }

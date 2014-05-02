@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package org.example.javaapi;
-
-import scala.concurrent.Future;
+package sample.javaapi;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.japi.JavaPartialFunction;
-import static akka.pattern.Patterns.ask;
-import static akka.pattern.Patterns.pipe;
-
 import com.github.levkhomich.akka.tracing.TracingExtension;
 import com.github.levkhomich.akka.tracing.TracingExtensionImpl;
+import scala.concurrent.Future;
+
+import static akka.pattern.Patterns.ask;
+import static akka.pattern.Patterns.pipe;
 
 public class RequestHandler extends UntypedActor {
 
@@ -35,9 +34,9 @@ public class RequestHandler extends UntypedActor {
 
     public void onReceive(Object message) throws Exception {
         if (message instanceof ExternalRequest) {
-            System.out.print("!");
-
             final ExternalRequest msg = (ExternalRequest) message;
+            System.out.print("RequestHandler received " + msg);
+
             // notify tracing extension about external request to be sampled and traced, name service processing request
             trace.sample(msg, this.getClass().getSimpleName());
 
@@ -48,7 +47,7 @@ public class RequestHandler extends UntypedActor {
 
             InternalRequest request = new InternalRequest(msg.getPayload());
 
-            Future<Object> f = ask(child, request.asChildOf(msg, trace), 500).recover(new JavaPartialFunction<Throwable, Object>() {
+            Future<Object> f = ask(child, request.asChildOf(msg, trace), 200).recover(new JavaPartialFunction<Throwable, Object>() {
                 @Override
                 public Object apply(Throwable e, boolean isCheck) throws Exception {
                     if (isCheck) return null;

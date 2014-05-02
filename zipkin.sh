@@ -45,7 +45,7 @@ start() {
   bin/web & disown  
   popd
   
-  sleep 20
+  sleep 30
   if which xdg-open > /dev/null; then
     xdg-open $ZIPKIN_URL
   elif which gnome-open > /dev/null; then

@@ -9,9 +9,9 @@
 
     <p>
         This tutorial aims to show you how to trace messages inside Akka system.
-        You will be guided through the tracing basics, sampling, hierarchical calls and spray integration.
+        You will be guided through the tracing basics, sampling, trace logging, hierarchical calls and spray integration.
         To see actual results you will need to have Twitter's Zipkin installed. Don't worry,
-        template contains script that will allow you to easily install and run it.
+        template contains script that installs and runs it.
     </p>
 
     <h3>Akka Tracing</h3>
@@ -34,29 +34,41 @@
         <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/annotations.png" width="800px" />
     </p>
 
+    <h3>Zipkin</h3>
+
+    <p>
+        <a href="http://twitter.github.io/zipkin/architecture.html" target="_blank">Zipkin</a> is a distributed tracing
+        system that helps to gather timing data for all the disparate services. It manages both the collection
+        and lookup of this data through a Collector and a Query service. Zipkin was modelled after the Google Dapper paper.
+    </p>
+
 </div>
 
 <div>
     <h2>Template overview</h2>
 
     <p>
-        The application consists of three parts:
+        The template consists of several parts:
         <ul>
             <li>
-                <a href="#code/src/main/scala/org/example/TraceHierarchy.scala" class="shortcut">Scala example</a>
-                showing call hierarchy tracing. Application just creates actor system and sends couple of traced messages.
-                Afterwards, you can see them using Zipkin Web UI.
+                <a href="#code/src/main/scala/sample/TracingBasics.scala" class="shortcut">Tracing basics example</a> -
+                shows basic steps required to trace request inside your app;
             </li>
             <li>
-                <a href="#code/src/main/java/org/example/javaapi/TraceHierarchy.java" class="shortcut">Java example</a>
-                showing the same thing;
+                <a href="#code/src/main/scala/sample/TraceHierarchy.scala" class="shortcut">Trace hierarchy example</a> -
+                shows how to trace call hierarchies;
             </li>
             <li>
-                <a href="#code/src/main/scala/org/example/SprayDirectives.scala" class="shortcut">Spray integration example</a>
-                (not well documented yet). This application starts http server with couple of routes with enabled tracing.
-                You can perform requests using curl or browser.
+                <a href="#code/src/main/scala/sample/SprayDirectives.scala" class="shortcut">Spray integration example</a> -
+                shows spray directives which can be used to enable tracing starting from http layer;
+            </li>
+            <li>
+                Also, you can take a look on <a href="#code/src/main/java/sample/javaapi/TraceHierarchy.java" class="shortcut">Java example</a>
+                showing Java API.
             </li>
         </ul>
+
+        You can run any example and see traces using Zipkin Web UI (messages are sent every second).
     </p>
 </div>
 
@@ -69,14 +81,14 @@
     <p>Template provides simple script that can pull, build and run Zipkin server. Just run this command from project's dir:</p>
 
 <pre><code>
-    zipkin.sh install && zipkin.sh start
+    ./zipkin.sh install && ./zipkin.sh start
 </code></pre>
 
 
     <p>To stop Zipkin, type</p>
 
 <pre><code>
-    zipkin.sh stop
+    ./zipkin.sh stop
 </code></pre>
 
     <p>Installation can take up to 10-15 minutes, so it's a good time to take a cup of tea before you continue reading.</p>
