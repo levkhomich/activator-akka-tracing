@@ -10,16 +10,25 @@
     <p>
         This tutorial aims to show you how to trace messages inside Akka system.
         You will be guided through the tracing basics, sampling, trace logging, hierarchical calls and spray integration.
-        To see actual results you will need to have Twitter's Zipkin installed. Don't worry,
+        To see actual results you will need to have Zipkin installed. Don't worry,
         template contains script that installs and runs it.
     </p>
 
     <h3>Akka Tracing</h3>
 
     <p>
-        <a href="https://github.com/levkhomich/akka-tracing" target="_blank">Akka Tracing</a>
-        is a distributed tracing Akka extension based on Twitter's Zipkin.
-        It can be used as performance diagnostics or debugging tool for distributed applications.
+        It is an <a href="https://github.com/levkhomich/akka-tracing">Akka distributed tracing extension</a>
+        which can be used as performance diagnostics and debugging tool. Distributed nature of Zipkin
+        (which it is based on) provides synergy with akka-remote and akka-cluster. Extension integrates with
+        Finagle services and Spray toolkit.
+    </p>
+
+    <h3>Zipkin</h3>
+
+    <p>
+        <a href="http://twitter.github.io/zipkin/architecture.html" target="_blank">Zipkin</a> is a distributed tracing
+        system that helps to gather timing data for all the disparate services. It manages both the collection
+        and lookup of this data through a Collector and a Query service. Zipkin was modelled after the Google Dapper paper.
     </p>
 
     <p>
@@ -34,21 +43,13 @@
         <img src="https://raw.githubusercontent.com/levkhomich/akka-tracing/gh-pages/screenshots/annotations.png" width="800px" />
     </p>
 
-    <h3>Zipkin</h3>
-
-    <p>
-        <a href="http://twitter.github.io/zipkin/architecture.html" target="_blank">Zipkin</a> is a distributed tracing
-        system that helps to gather timing data for all the disparate services. It manages both the collection
-        and lookup of this data through a Collector and a Query service. Zipkin was modelled after the Google Dapper paper.
-    </p>
-
 </div>
 
 <div>
     <h2>Template overview</h2>
 
     <p>
-        The template consists of several parts:
+        This template consists of several parts:
         <ul>
             <li>
                 <a href="#code/src/main/scala/sample/TracingBasics.scala" class="shortcut">Tracing basics example</a> -
@@ -68,7 +69,7 @@
             </li>
         </ul>
 
-        You can run any example and see traces using Zipkin Web UI (messages are sent every second).
+        You can run any example and see traces using Zipkin Web UI.
     </p>
 </div>
 
@@ -84,7 +85,6 @@
     ./zipkin.sh install && ./zipkin.sh start
 </code></pre>
 
-
     <p>To stop Zipkin, type</p>
 
 <pre><code>
@@ -95,7 +95,7 @@
 
     <h3>Another Way</h3>
 
-    <p>If you want to install Zipkin manually, do the following.</p>
+    <p>If you want to install Zipkin manually, follow this steps...</p>
 
     <p>Clone project from its official repo:</p>
 
@@ -224,7 +224,7 @@ bin/web
 libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.2"
 </code></pre>
 
-    <p>or, if you want to experiment with snapshot:</p>
+    <p>or, if you want to experiment with snapshot (and that's what this template does):</p>
 
 <pre><code>
 resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
@@ -261,7 +261,7 @@ akka.tracing {
     </p>
     <p>
         For more information about Zipkin, you can explore
-        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project site</a>
+        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project page</a>
         or ask questions in the
         <a href="https://groups.google.com/forum/#!forum/zipkin-user" target="_blank">Zipkin user group</a>.
     </p>
