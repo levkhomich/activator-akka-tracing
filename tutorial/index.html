@@ -81,14 +81,12 @@
 
     <p>Template provides simple script that can pull, build and run Zipkin server. Just run this command from project's dir:</p>
 
-<pre><code>
-    ./zipkin.sh install && ./zipkin.sh start
+<pre><code>./zipkin.sh install && ./zipkin.sh start
 </code></pre>
 
     <p>To stop Zipkin, type</p>
 
-<pre><code>
-    ./zipkin.sh stop
+<pre><code>./zipkin.sh stop
 </code></pre>
 
     <p>Installation can take up to 10-15 minutes, so it's a good time to take a cup of tea before you continue reading.</p>
@@ -99,21 +97,17 @@
 
     <p>Clone project from its official repo:</p>
 
-<pre><code>
-mkdir ~/opt && cd ~/opt
+<pre><code>mkdir ~/opt && cd ~/opt
 git clone https://github.com/twitter/zipkin.git && cd zipkin
 </code></pre>
 
     <p>Tracing extension only requires collector service running:</p>
 
-<pre><code>
-bin/collector
-</code></pre>
+<pre><code>bin/collector</code></pre>
 
     <p>To actually search and inspect traces, launch query and web services in different bash sessions:</p>
 
-<pre><code>
-bin/query
+<pre><code>bin/query
 bin/web
 </code></pre>
 
@@ -174,18 +168,18 @@ bin/web
 
     <p>To access extension itself, define <code>trace</code> field:</p>
 
-<pre><code>TracingExtensionImpl trace = (TracingExtensionImpl) TracingExtension.apply(context().system());</code></pre>
+<pre><code>TracingExtensionImpl trace = (TracingExtensionImpl) TracingExtension.apply(context().system());
+</code></pre>
 
     <h3>Sampling</h3>
 
     <p>
         Sampling is performed using <code>trace.sample(msg, serviceName, rpcName)</code> method.
-        Recommended way of message sampling is to call this method as soon as you can after message
-        was received by your actor system. Sampling rate can be changed using
-        <code>akka.tracing.sample-rate</code> config parameter.
+        It's recommended to call this method right after message was received by your actor system.
+        Sampling rate can be changed using <code>akka.tracing.sample-rate</code> config parameter.
     </p>
 
-    <h3>Annotating traces</h3>
+    <h3>Trace annotations</h3>
 
     <p>There are several methods allowing you to annotate traces:</p>
 
@@ -198,7 +192,7 @@ bin/web
             where value can be represented by String, Short, Int, Long, Boolean, Double or Array[Byte].
             This kind of annotations can be used by <code>key-value</code> filter in Web UI.</li>
         <li>
-            <code>trace.recordException(msg, exception)</code> - pipes exception stack trace to message trace timeline.
+            <code>trace.recordException(msg, exception)</code> - writes exception's stack trace to trace.
         </li>
     </ol>
 
@@ -220,14 +214,12 @@ bin/web
 
     <p>Include extension to the list of your project's dependencies:</p>
 
-<pre><code>
-libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.2"
+<pre><code>libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.2"
 </code></pre>
 
     <p>or, if you want to experiment with snapshot (and that's what this template does):</p>
 
-<pre><code>
-resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+<pre><code>resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.3-SNAPSHOT" changing()
 </code></pre>
@@ -236,17 +228,15 @@ libraryDependencies += "com.github.levkhomich" %% "akka-tracing-core" % "0.3-SNA
 
     <p>You will need to define collector's endpoint:</p>
 
-<pre><code>
-akka.tracing {
+<pre><code>akka.tracing {
   host = "localhost"
   port = 9410 # default
-}
-</code></pre>
+}</code></pre>
 
     <p>Also you can setup extension to be initialized with actor system (it's not required, though):</p>
 
 <pre><code>
-    akka.extensions += "com.github.levkhomich.akka.tracing.TracingExtension"
+akka.extensions += "com.github.levkhomich.akka.tracing.TracingExtension"
 </code></pre>
 
 </div>
@@ -261,7 +251,7 @@ akka.tracing {
     </p>
     <p>
         For more information about Zipkin, you can explore
-        <a href="http://twitter.github.io/zipkin/" target="_blank">Zipkin project page</a>
+        <a href="http://twitter.github.io/zipkin" target="_blank">Zipkin project page</a>
         or ask questions in the
         <a href="https://groups.google.com/forum/#!forum/zipkin-user" target="_blank">Zipkin user group</a>.
     </p>
