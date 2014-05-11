@@ -69,24 +69,24 @@
             </li>
         </ul>
 
-        To see results you will need to setup Zipkin (see next step).
     </p>
-</div>
 
-<div>
+    <p>
+        Before running examples you will need to run Zipkin server. This can be achieved by running template's sbt tasks,
+        or by running <code>zipkin.Start</code> main class from Activator's run menu. On the first run, Zipkin will be
+        cloned from it's official repo to project's dir, then, in 10-15 minutes, it will be built and ready to go. After server
+        launch, you can press <code>Stop</code> button in Activator's UI (Zipkin will continue running in separate threads).
+    </p>
 
-    <h2>Setup Zipkin</h2>
+    <p>
+        Use <code>zipkin.Stop</code> or corresponding SBT task to stop tracing server.
+    </p>
 
-    <p>Template provides SBT tasks to install, update and run Zipkin server.</p>
+    <p>
+        Short description of template's SBT tasks:
+    </p>
 
     <ul>
-        <li>
-            <code>sbt zipkin-install</code> installs Zipkin to project's dir. Installation can take up to
-            10-15 minutes.
-        </li>
-        <li>
-            <code>sbt zipkin-update</code> updates installed Zipkin.
-        </li>
         <li>
             <code>sbt zipkin-start</code> launches zipkin-collector, zipkin-query and zipkin-web.
             Zipkin Web UI will be available at <a href="http://localhost:8080">http://localhost:8080</a>.
@@ -94,12 +94,12 @@
         <li>
             <code>sbt zipkin-start</code> stops all running zipkin services.
         </li>
+        <li>
+            <code>sbt zipkin-update</code> updates installed Zipkin.
+        </li>
     </ul>
 
-    <p>More comprehensive setup guide can be found <a href="http://twitter.github.io/zipkin/install.html">here</a>.</p>
-
 </div>
-
 
 <div>
     <h2>Tracing overview</h2>

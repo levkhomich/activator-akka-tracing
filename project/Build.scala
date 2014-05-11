@@ -3,16 +3,6 @@ import Keys._
 
 object ProjectBuild extends Build {
 
-  val zipkinInstall = TaskKey[Unit]("zipkin-install", "Installs zipkin to project's dir")
-  val zipkinUpdate = TaskKey[Unit]("zipkin-update", "Updates zipkin")
-  val zipkinStart = TaskKey[Unit]("zipkin-start", "Starts zipkin")
-  val zipkinStop = TaskKey[Unit]("zipkin-stop", "Stops zipkin")
-
-  def zipkinScript(param: String): String = {
-    val base = root.base.getAbsolutePath
-    s"$base/project/zipkin.sh $param"
-  }
-
   lazy val root = Project(
 
     id = "activator-akka-tracing",
@@ -43,12 +33,7 @@ object ProjectBuild extends Build {
             "io.spray" % "spray-client" % "1.3.1",
             "com.typesafe" % "config" % "1.2.0",
             "com.typesafe.akka" %% "akka-actor" % "2.3.2"
-          ),
-
-        zipkinInstall := zipkinScript("install").!,
-        zipkinUpdate := zipkinScript("update").!,
-        zipkinStart := zipkinScript("start").!,
-        zipkinStop := zipkinScript("stop").!
+          )
       )
   )
 }

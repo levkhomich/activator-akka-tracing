@@ -23,7 +23,7 @@ fi
 update() {
   check
   if [ ! -d $ZIPKIN_DIR ]; then
-    echo "Zipkin not found. Run 'sbt zipkin-install' to install it."
+    echo "Zipkin not found. Run install first."
     exit 1
   fi
   pushd .
@@ -37,32 +37,35 @@ install() {
   check
   if [ ! -d $ZIPKIN_DIR ]; then
     git clone $ZIPKIN_GIT
+    update
   fi
-  update
 }
 
 start() {
   if [ ! -d $ZIPKIN_DIR ]; then
-    echo "Zipkin not found. Run 'sbt zipkin-install' to install it."
-    exit 1
+    echo "Zipkin not found. Installing it..."
+    install
   fi
-  
+
+  stop
+
   pushd .
   cd $ZIPKIN_DIR
-  bin/collector & disown
+  bin/collector &
   sleep 15
-  bin/web & disown
+  bin/web &
   sleep 15
-  bin/query & disown
+  bin/query &
   sleep 15
   popd
   
-  sleep 30
   if which xdg-open > /dev/null; then
     xdg-open $ZIPKIN_URL
   elif which gnome-open > /dev/null; then
     gnome-open $ZIPKIN_URL
   fi
+
+  wait
 }
 
 stop() {
