@@ -34,15 +34,18 @@ install() {
 
 start() {
   if [ ! -d $ZIPKIN_DIR ]; then
-    echo "Zipkin not found. Run '`basename $0` install' to install it."
+    echo "Zipkin not found. Run 'sbt zipkin-install' to install it."
     exit 1
   fi
   
   pushd .
   cd $ZIPKIN_DIR
   bin/collector & disown
+  sleep 15
   bin/query & disown
-  bin/web & disown  
+  sleep 15
+  bin/web & disown
+  sleep 15
   popd
   
   sleep 30

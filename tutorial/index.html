@@ -69,49 +69,29 @@
             </li>
         </ul>
 
-        You can run any example and see traces using Zipkin Web UI.
+        To see results you will need to setup Zipkin (see next step).
     </p>
 </div>
 
 <div>
 
-    <h2>Setup</h2>
+    <h2>Setup Zipkin</h2>
 
-    <h3>Install script</h3>
+    <p>Template provides SBT tasks to install and run Zipkin server.</p>
 
-    <p>Template provides simple script that can pull, build and run Zipkin server. Just run this command from project's dir:</p>
-
-<pre><code>./zipkin.sh install && ./zipkin.sh start
-</code></pre>
-
-    <p>To stop Zipkin, type</p>
-
-<pre><code>./zipkin.sh stop
-</code></pre>
-
-    <p>Installation can take up to 10-15 minutes, so it's a good time to take a cup of tea before you continue reading.</p>
-
-    <h3>Another Way</h3>
-
-    <p>If you want to install Zipkin manually, follow this steps...</p>
-
-    <p>Clone project from its official repo:</p>
-
-<pre><code>mkdir ~/opt && cd ~/opt
-git clone https://github.com/twitter/zipkin.git && cd zipkin
-</code></pre>
-
-    <p>Tracing extension only requires collector service running:</p>
-
-<pre><code>bin/collector</code></pre>
-
-    <p>To actually search and inspect traces, launch query and web services in different bash sessions:</p>
-
-<pre><code>bin/query
-bin/web
-</code></pre>
-
-    <p>Zipkin Web UI will be available via <a href="http://localhost:8080">http://localhost:8080</a>.</p>
+    <ul>
+        <li>
+            <code>sbt zipkin-install</code> installs Zipkin to project's dir. Installation can take up to
+            10-15 minutes.
+        </li>
+        <li>
+            <code>sbt zipkin-start</code> launches zipkin-collector, zipkin-query and zipkin-web.
+            Zipkin Web UI will be available at <a href="http://localhost:8080">http://localhost:8080</a>.
+        </li>
+        <li>
+            <code>sbt zipkin-start</code> stops all running zipkin services
+        </li>
+    </ul>
 
     <p>More comprehensive setup guide can be found <a href="http://twitter.github.io/zipkin/install.html">here</a>.</p>
 
