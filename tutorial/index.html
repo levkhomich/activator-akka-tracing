@@ -77,7 +77,7 @@
 
     <h2>Setup Zipkin</h2>
 
-    <p>Template provides SBT tasks to install and run Zipkin server.</p>
+    <p>Template provides SBT tasks to install, update and run Zipkin server.</p>
 
     <ul>
         <li>
@@ -85,11 +85,14 @@
             10-15 minutes.
         </li>
         <li>
+            <code>sbt zipkin-update</code> updates installed Zipkin.
+        </li>
+        <li>
             <code>sbt zipkin-start</code> launches zipkin-collector, zipkin-query and zipkin-web.
             Zipkin Web UI will be available at <a href="http://localhost:8080">http://localhost:8080</a>.
         </li>
         <li>
-            <code>sbt zipkin-start</code> stops all running zipkin services
+            <code>sbt zipkin-start</code> stops all running zipkin services.
         </li>
     </ul>
 

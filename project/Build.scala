@@ -4,6 +4,7 @@ import Keys._
 object ProjectBuild extends Build {
 
   val zipkinInstall = TaskKey[Unit]("zipkin-install", "Installs zipkin to project's dir")
+  val zipkinUpdate = TaskKey[Unit]("zipkin-update", "Updates zipkin")
   val zipkinStart = TaskKey[Unit]("zipkin-start", "Starts zipkin")
   val zipkinStop = TaskKey[Unit]("zipkin-stop", "Stops zipkin")
 
@@ -45,6 +46,7 @@ object ProjectBuild extends Build {
           ),
 
         zipkinInstall := zipkinScript("install").!,
+        zipkinUpdate := zipkinScript("update").!,
         zipkinStart := zipkinScript("start").!,
         zipkinStop := zipkinScript("stop").!
       )
