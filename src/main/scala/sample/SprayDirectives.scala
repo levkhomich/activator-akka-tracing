@@ -39,7 +39,7 @@ object BasicRequest {
   // spray unmarshaller
   implicit val basicRequestUnmarshaller =
     Unmarshaller[BasicRequest](ContentTypeRange.*) {
-      case HttpEntity.NonEmpty(_, data) => BasicRequest(data.toString)
+      case HttpEntity.NonEmpty(_, data) => BasicRequest(data.asString)
       case HttpEntity.Empty => BasicRequest("")
     }
   // spray marshaller
@@ -53,7 +53,7 @@ object BasicRequest {
   implicit val RootRequestUnmarshallerWithTracingSupport = unmarshallerWithTracingSupport[BasicRequest]
 }
 
-class SprayDirectivesServiceActor extends Actor with ActorTracing with HttpService with TracingDirectives {
+class SprayDirectivesServiceActor extends Actor with ActorTracing with HttpService with TracingDirectives with ActorLogging {
 
   import SprayDirectives._
 
@@ -64,13 +64,13 @@ class SprayDirectivesServiceActor extends Actor with ActorTracing with HttpServi
 
   def process(r: BasicRequest): Future[BasicRequest] =
     Future {
-      Thread.sleep(Random.nextInt(1000))
+      Thread.sleep(Random.nextInt(500) + 500)
       trace.recordKeyValue(r, "data", r.data)
       BasicRequest(r.data.reverse)
     }
 
   val route = {
-    get {
+    post {
       path(unmarshallingPath) {
         // this case uses spray directives with custom unmarshalling, which allows 
         // to continue traces passed from outsied (from frontend for example)
@@ -122,7 +122,7 @@ class ClientActor extends Actor {
     // forward and log all messages
     case url: String =>
       val msg = BasicRequest(UUID.randomUUID().toString)
-      pipeline(Get(url, msg))
+      pipeline(Post(url, msg))
       println(s"Sent $msg to $url")
   }
 }
@@ -138,7 +138,6 @@ object SprayDirectives extends App {
   implicit val system = ActorSystem("SprayDirectives")
   val service = system.actorOf(Props[SprayDirectivesServiceActor], "spray-directives-service")
   IO(Http) ! Http.Bind(service, host, port)
-  // create client actor
-  system.actorOf(Props[ClientActor])
+//  system.actorOf(Props[ClientActor])
   system.awaitTermination()
 }
