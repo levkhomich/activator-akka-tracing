@@ -17,8 +17,8 @@ object ProjectBuild extends Build {
         homepage := Some(url("https://github.com/levkhomich/akka-tracing")),
         licenses := Seq("Apache Public License 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
 
-        scalaVersion := "2.10.4",
-        crossScalaVersions := Seq("2.10.4", "2.11.0"),
+        scalaVersion := "2.11.1",
+        crossScalaVersions := Seq("2.10.4", "2.11.1"),
         scalacOptions in GlobalScope ++= Seq("-Xcheckinit", "-Xlint", "-deprecation", "-unchecked", "-feature", "-language:_"),
         scalacOptions in Test ++= Seq("-Yrangepos"),
 
@@ -33,6 +33,11 @@ object ProjectBuild extends Build {
             "io.spray" % "spray-client" % "1.3.1",
             "com.typesafe" % "config" % "1.2.0",
             "com.typesafe.akka" %% "akka-actor" % "2.3.2"
+          ) ++ (
+            if (scalaVersion.value == "2.11.1")
+              Seq("org.scala-lang.modules" %% "scala-xml" % "1.0.2")
+            else
+              Seq.empty
           )
       )
   )
