@@ -27,8 +27,8 @@ object ProjectBuild extends Build {
         resolvers += "Maven Central Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
         libraryDependencies ++=
           Seq(
-            "com.github.levkhomich" %% "akka-tracing-core" % "0.3-SNAPSHOT" changing(),
-            "com.github.levkhomich" %% "akka-tracing-spray" % "0.3-SNAPSHOT" changing(),
+            "com.github.levkhomich" %% "akka-tracing-core" % "0.3",
+            "com.github.levkhomich" %% "akka-tracing-spray" % "0.3",
             "io.spray" % "spray-can" % "1.3.1",
             "io.spray" % "spray-client" % "1.3.1",
             "com.typesafe" % "config" % "1.2.0",
