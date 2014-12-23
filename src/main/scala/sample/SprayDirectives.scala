@@ -29,7 +29,6 @@ import spray.httpx.unmarshalling._
 import spray.routing.HttpService
 
 import com.github.levkhomich.akka.tracing.{ActorTracing, TracingSupport}
-import com.github.levkhomich.akka.tracing.http.unmarshalling._
 import com.github.levkhomich.akka.tracing.http.TracingDirectives
 import java.util.UUID
 
@@ -50,7 +49,7 @@ object BasicRequest {
 
   // helper which provides unmarshaller that initializes message by tracing params passed via request headers
   // regular unmarshaller for message should be provided implicitly
-  implicit val RootRequestUnmarshallerWithTracingSupport = unmarshallerWithTracingSupport[BasicRequest]
+//  implicit val RootRequestUnmarshallerWithTracingSupport = unmarshallerWithTracingSupport[BasicRequest]
 }
 
 class SprayDirectivesServiceActor extends Actor with ActorTracing with HttpService with TracingDirectives with ActorLogging {
@@ -73,7 +72,7 @@ class SprayDirectivesServiceActor extends Actor with ActorTracing with HttpServi
     post {
       path(unmarshallingPath) {
         // this case uses spray directives with custom unmarshalling, which allows 
-        // to continue traces passed from outsied (from frontend for example)
+        // to continue traces passed from outside
         entity(as[BasicRequest]) { request =>
           // but you still need to sample
           trace.sample(request, "spray-directives-service")

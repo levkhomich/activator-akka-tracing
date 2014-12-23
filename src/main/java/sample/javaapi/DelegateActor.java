@@ -38,7 +38,7 @@ public class DelegateActor extends UntypedActor {
             Thread.sleep(rng.nextInt(200));
             sender().tell(new InternalResponse(200, "Hello, " + msg.getPayload()), self());
             // fire server send event
-            trace.recordServerSend(msg);
+            trace.finish(msg);
         } else {
             unhandled(message);
         }
