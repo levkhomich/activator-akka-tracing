@@ -10,7 +10,7 @@ object ProjectBuild extends Build {
       Seq (
         name := "activator-akka-tracing",
         organization := "com.github.levkhomich",
-        version := "0.3-SNAPSHOT",
+        version := "0.4-SNAPSHOT",
 
         homepage := Some(url("https://github.com/levkhomich/akka-tracing")),
         licenses := Seq("Apache Public License 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
