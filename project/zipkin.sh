@@ -28,8 +28,18 @@ update() {
   fi
   pushd .
   cd $ZIPKIN_DIR
+
+  git stash
   git pull origin master
-  bin/sbt compile
+  echo "Compiling..."
+
+  # speed up compilation
+  sed -i "" "s/.dependsOn(collectorCore, collectorScribe, receiverKafka, cassandra, kafka, redis, anormDB, hbase)/.dependsOn(collectorCore, collectorScribe, anormDB)/" project/Project.scala
+  sed -i "" "s/.dependsOn(queryCore, cassandra, redis, anormDB, hbase)/.dependsOn(queryCore, anormDB)/" project/Project.scala
+
+  bin/sbt "project zipkin-web" compile "project zipkin-collector-service" compile  "project zipkin-query-service" compile
+
+  echo "Compilation finished"
   popd
 }
 
@@ -63,6 +73,8 @@ start() {
     xdg-open $ZIPKIN_URL
   elif which gnome-open > /dev/null; then
     gnome-open $ZIPKIN_URL
+  elif which open > /dev/null; then
+    open $ZIPKIN_URL
   fi
 
   wait
