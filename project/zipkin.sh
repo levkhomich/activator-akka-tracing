@@ -1,15 +1,15 @@
 #!/bin/bash
 
 ZIPKIN_DIR="zipkin"
-ZIPKIN_GIT="https://github.com/twitter/zipkin.git"
-ZIPKIN_URL="http://localhost:8080"
+ZIPKIN_JAR_LOCATION="https://search.maven.org/remote_content?g=io.zipkin.java&a=zipkin-server&v=LATEST&c=exec"
+ZIPKIN_URL="http://localhost:9411"
 
 usage() {
   echo "Usage: `basename $0` {install|start|stop|restart}"
 }
 
 check() {
-  for i in "git pkill"
+  for i in "pkill wget"
   do
     command -v $i >/dev/null && continue || { echo "$i command not found."; exit 1; }
   done
@@ -26,27 +26,13 @@ update() {
     echo "Zipkin not found. Run install first."
     exit 1
   fi
-  pushd .
-  cd $ZIPKIN_DIR
-
-  git stash
-  git pull origin master
-  echo "Compiling..."
-
-  # speed up compilation
-  sed -i "" "s/.dependsOn(collectorCore, collectorScribe, receiverKafka, cassandra, kafka, redis, anormDB, hbase)/.dependsOn(collectorCore, collectorScribe, anormDB)/" project/Project.scala
-  sed -i "" "s/.dependsOn(queryCore, cassandra, redis, anormDB, hbase)/.dependsOn(queryCore, anormDB)/" project/Project.scala
-
-  bin/sbt "project zipkin-web" compile "project zipkin-collector-service" compile  "project zipkin-query-service" compile
-
-  echo "Compilation finished"
-  popd
+  wget -O $ZIPKIN_DIR/zipkin.jar $ZIPKIN_JAR_LOCATION
 }
 
 install() {
   check
   if [ ! -d $ZIPKIN_DIR ]; then
-    git clone $ZIPKIN_GIT
+    mkdir $ZIPKIN_DIR
     update
   fi
 }
@@ -59,15 +45,9 @@ start() {
 
   stop
 
-  pushd .
-  cd $ZIPKIN_DIR
-  bin/collector &
-  sleep 15
-  bin/web &
-  sleep 15
-  bin/query &
-  sleep 15
-  popd
+  java -jar $ZIPKIN_DIR/zipkin.jar
+
+  sleep 10s
   
   if which xdg-open > /dev/null; then
     xdg-open $ZIPKIN_URL
@@ -81,9 +61,7 @@ start() {
 }
 
 stop() {
-  pkill -f zipkin-web
-  pkill -f zipkin-query
-  pkill -f zipkin-collector
+  pkill -f zipkin.jar
 }
 
 
