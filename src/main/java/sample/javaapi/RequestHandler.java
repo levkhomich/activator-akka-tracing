@@ -38,7 +38,7 @@ public class RequestHandler extends UntypedActor {
             System.out.print("RequestHandler received " + msg);
 
             // notify tracing extension about external request to be sampled and traced, name service processing request
-            trace.sample(msg, this.getClass().getSimpleName());
+            trace.sample(msg, this.getClass().getSimpleName(), false);
 
             // add info about request headers to trace
             for (String key : msg.getHeaders().keySet()) {

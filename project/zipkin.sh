@@ -45,7 +45,7 @@ start() {
 
   stop
 
-  java -jar $ZIPKIN_DIR/zipkin.jar
+  java -jar $ZIPKIN_DIR/zipkin.jar &
 
   sleep 10s
   

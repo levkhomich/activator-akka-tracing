@@ -33,7 +33,7 @@ public class DelegateActor extends UntypedActor {
             System.out.print("DelegateActor received " + msg);
 
             // notify tracing extension about external request to be sampled and traced, name service processing request
-            trace.sample(msg, this.getClass().getSimpleName());
+            trace.sample(msg, this.getClass().getSimpleName(), false);
             // another computation (sometimes leading to timeout)
             Thread.sleep(rng.nextInt(200));
             sender().tell(new InternalResponse(200, "Hello, " + msg.getPayload()), self());

@@ -25,12 +25,14 @@ object ProjectBuild extends Build {
         resolvers += "Maven Central Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
         libraryDependencies ++=
           Seq(
-            "com.github.levkhomich" %% "akka-tracing-core" % "0.4",
-            "com.github.levkhomich" %% "akka-tracing-spray" % "0.4",
+            "com.github.levkhomich" %% "akka-tracing-core" % "0.5",
+            "com.github.levkhomich" %% "akka-tracing-spray" % "0.5",
             "io.spray" %% "spray-can" % "1.3.2",
             "io.spray" %% "spray-client" % "1.3.2",
             "com.typesafe" % "config" % "1.2.1",
-            "com.typesafe.akka" %% "akka-actor" % "2.3.8"
+            "com.typesafe.akka" %% "akka-actor" % "2.3.14",
+            "com.typesafe.akka" %% "akka-slf4j" % "2.3.14",
+            "ch.qos.logback"      %  "logback-classic"     % "1.1.3"
           ) ++ (
             if (scalaVersion.value == "2.11.4")
               Seq("org.scala-lang.modules" %% "scala-xml" % "1.0.3")
